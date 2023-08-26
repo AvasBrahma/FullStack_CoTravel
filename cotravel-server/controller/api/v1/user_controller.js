@@ -1,3 +1,4 @@
+const { model } = require('mongoose');
 const User=require('../../../models/user');
 const jwt=require('jsonwebtoken');
 
@@ -56,3 +57,28 @@ module.exports.login=async function(req, res){
   })
 }
 
+
+module.exports.updateProfile=async function(req, res){
+  console.log(req.body);
+  const user= await User.findByIdAndUpdate(req.body.userid, {
+    name: req.body.name,
+ },{
+    new: true
+ })
+
+if(user){
+    res.status(200).json({
+        success: true,
+        message: 'User Profile Updated Successfully',
+        data:{
+          token: jwt.sign(user.toJSON(), 'test123', { expiresIn: '100000'}),
+          user
+        }
+    })
+}else{
+    res.status(500).json({
+        success: false,
+        message: 'Cannot Update the User'
+    })
+}
+}
